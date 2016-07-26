@@ -7,12 +7,62 @@ import (
 	"log"
 	"net"
 	"strings"
+	"time"
 )
 
-var MESSAGE_SEPARATOR = fmt.Sprintf("%c%c", rune(0x1c), rune(0x0d))
-var MESSAGE_HEADER = rune(0x0b)
+const (
+	MESSAGE_SEPARATOR = "\x1c\x0d"
+	MESSAGE_HEADER    = '\x0b'
+)
 
-func connectionHandler(conn net.Conn, out chan string) {
+func FormatMessage(msg string) string {
+	return strings.Replace(msg, "\r", "\n", -1)
+}
+
+func HL7TS(t time.Time) string {
+	return fmt.Sprintf(
+		"%d%d%d%d%d%d",
+		t.Year(),
+		t.Month(),
+		t.Day(),
+		t.Hour(),
+		t.Minute(),
+		t.Second())
+}
+
+func MakeAck(msg string) string {
+	msh := msg[0:strings.Index(msg, "\r")]
+	mshSegments := strings.Split(msh, "|")
+
+	ackMsh := []string{
+		"MSH",
+		"^~\\&",
+		mshSegments[4],
+		mshSegments[5],
+		mshSegments[2],
+		mshSegments[3],
+		HL7TS(time.Now()),
+		"",
+		"ACK",
+		"",
+		mshSegments[10],
+		"2.4",
+	}
+
+	ackMsa := []string{
+		"MSA",
+		"AA",
+		mshSegments[9],
+		"",
+		"",
+		"",
+		"",
+	}
+
+	return strings.Join(ackMsh, "|") + "\r" + strings.Join(ackMsa, "|") + "\r"
+}
+
+func ConnectionHandler(conn net.Conn, out chan string) {
 	defer close(out)
 	var reader = bufio.NewReader(conn)
 	var tail = ""
@@ -22,7 +72,8 @@ func connectionHandler(conn net.Conn, out chan string) {
 
 		bytesRead, err := reader.Read(buff)
 		if err != nil {
-			return
+			fmt.Printf("Error: %v", err)
+			// return
 		}
 
 		var messages = strings.Split(string(buff[:bytesRead]), MESSAGE_SEPARATOR)
@@ -45,16 +96,16 @@ func connectionHandler(conn net.Conn, out chan string) {
 	}
 }
 
-func messageSender(in <-chan string, out chan string, aidboxUrl string) {
+func MessageSender(in <-chan string, out chan string, aidboxUrl string) {
 	for msg := range in {
-		log.Printf("\n%s", msg)
-		out <- "ACK|||||||||\r"
+		log.Printf("\n%s", FormatMessage(msg))
+		out <- MakeAck(msg)
 	}
 }
 
-func ackSender(conn net.Conn, in <-chan string) {
+func AckSender(conn net.Conn, in <-chan string) {
 	for ack := range in {
-		log.Printf("Sending ACK: %s\n\n", ack)
+		log.Printf("Sending ACK: %s\n\n", FormatMessage(ack))
 		conn.Write([]byte(string(MESSAGE_HEADER)))
 		conn.Write([]byte(ack))
 		conn.Write([]byte(MESSAGE_SEPARATOR))
@@ -77,6 +128,8 @@ func main() {
 
 	for {
 		conn, err := psock.Accept()
+		log.Printf("Received connection from %s", conn.RemoteAddr())
+
 		if err != nil {
 			return
 		}
@@ -84,8 +137,8 @@ func main() {
 		msgChan := make(chan string)
 		ackChan := make(chan string)
 
-		go connectionHandler(conn, msgChan)
-		go messageSender(msgChan, ackChan, *aidboxUrl)
-		go ackSender(conn, ackChan)
+		go ConnectionHandler(conn, msgChan)
+		go MessageSender(msgChan, ackChan, *aidboxUrl)
+		go AckSender(conn, ackChan)
 	}
 }
