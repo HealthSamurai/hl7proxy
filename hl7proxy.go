@@ -72,8 +72,9 @@ func ConnectionHandler(conn net.Conn, out chan string) {
 
 		bytesRead, err := reader.Read(buff)
 		if err != nil {
-			fmt.Printf("Error: %v", err)
-			// return
+			// fmt.Printf("Error: %v\n", err)
+			log.Printf("Client disconnected: %s", conn.RemoteAddr())
+			return
 		}
 
 		var messages = strings.Split(string(buff[:bytesRead]), MESSAGE_SEPARATOR)
@@ -97,6 +98,8 @@ func ConnectionHandler(conn net.Conn, out chan string) {
 }
 
 func MessageSender(in <-chan string, out chan string, aidboxUrl string) {
+	defer close(out)
+
 	for msg := range in {
 		log.Printf("\n%s", FormatMessage(msg))
 		out <- MakeAck(msg)
