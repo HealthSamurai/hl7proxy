@@ -1,5 +1,8 @@
 # HL7 v2 MLLP to Aidbox proxy
 
+[![Build
+Status](https://travis-ci.org/HealthSamurai/hl7proxy.svg?branch=master)](https://travis-ci.org/HealthSamurai/hl7proxy)
+
 This tiny utility is intended to capture HL7 v2 traffic and submit
 every received message to the Aidbox FHIR Server where message parsing
 and mapping will happen.
@@ -26,4 +29,20 @@ you'll need to make binary executable after downloading it:
 chmod +x ~/Downloads/hl7proxy-linux-amd64
 ```
 
-(don't forget to alter the filename if you use different OS/architecture)
+(don't forget to alter the filename if you use different
+OS/architecture)
+
+`cd` into the directory where `hl7proxy` file is located and invoke
+it:
+
+```
+./hl7proxy -port 5000
+```
+
+If you see a message `Listening to :5000` then `hl7proxy` is running
+and ready to accept connections.
+
+## Running as a Windows service
+
+To be written. Short answer: use [NSSM](http://nssm.cc/) to register
+`hl7proxy` as a Service.
