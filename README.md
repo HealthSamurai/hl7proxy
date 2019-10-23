@@ -46,3 +46,15 @@ and ready to accept connections.
 
 To be written. Short answer: use [NSSM](http://nssm.cc/) to register
 `hl7proxy` as a Service.
+
+
+## Support
+
+Feel free to join "Aidbox Users" Telegram group to ask questions:
+https://t.me/aidbox
+
+## License
+
+Copyright © 2019 [Health Samurai](https://health-samurai.io/) team.
+
+hl7proxy is released under the terms of the MIT License.
