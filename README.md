@@ -19,6 +19,19 @@ Precompiled binaries are available on
 page. For now there is only one [Latest Unstable
 Build](https://github.com/HealthSamurai/hl7proxy/releases/tag/edge).
 
+## Configuring Aidbox
+
+Before running `hl7proxy` utility you need to configure your Aidbox
+instance with proper `Hl7v2Config` resource. Follow [HL7V2-IN
+documentation](https://docs.aidbox.app/advanced/hl7-v2-integration)
+for detailed instructions.
+
+Also you'll need to make a OAuth Client resource to authorize
+`hl7proxy` HTTP requests. Follow [Basic Auth
+tutorial](https://docs.aidbox.app/auth-betta/basic-auth) to get a
+value for `Authorization` header and then pass it to `hl7proxy`
+utility with `-header` command-line flag.
+
 ## Usage
 
 `hl7proxy` is a command-line utility, so you need to start Terminal or
@@ -32,21 +45,24 @@ chmod +x ~/Downloads/hl7proxy-linux-amd64
 (don't forget to alter the filename if you use different
 OS/architecture)
 
-`cd` into the directory where `hl7proxy` file is located and invoke
+`cd` into the directory where `hl7proxy` binary is located and invoke
 it:
 
 ```
-./hl7proxy -port 5000
+./hl7proxy -port 5000 -config default -url https://your-box.edge.aidbox.app/ -header "Authorization: Basic xxxxxxxxxxxxx"
 ```
 
+Make sure you changed `-header`, `-url` and `-config` values to match
+your Aidbox instance configuration.
+
 If you see a message `Listening to :5000` then `hl7proxy` is running
-and ready to accept connections.
+and ready to accept connections. You can change port number with
+`-port` flag.
 
 ## Running as a Windows service
 
 To be written. Short answer: use [NSSM](http://nssm.cc/) to register
 `hl7proxy` as a Service.
-
 
 ## Support
 
