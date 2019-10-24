@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -194,8 +195,8 @@ func (i *flagsStringsArray) Set(value string) error {
 
 func main() {
 	port := flag.Int("port", 5000, "HL7 port to listen")
-	aidboxUrl := flag.String("url", "", "Aidbox URL to send messages to (i.e. 'https://foo.aidbox.app/')")
-	configId := flag.String("config", "", "An ID of existing Hl7v2Config resource")
+	aidboxUrl := flag.String("url", "", "Aidbox URL to send messages to (i.e. 'https://foo.aidbox.app/') (required)")
+	configId := flag.String("config", "", "An ID of existing Hl7v2Config resource (required)")
 
 	var headers flagsStringsArray = make(flagsStringsArray, 0)
 	flag.Var(&headers, "header", "Additional HTTP headers in format 'Header: value'")
@@ -203,6 +204,18 @@ func main() {
 	listenStr := fmt.Sprintf(":%d", *port)
 
 	flag.Parse()
+
+	if *configId == "" {
+		fmt.Printf("No required -config flag is provided. Usage:\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	if *aidboxUrl == "" {
+		fmt.Printf("No required -url flag is provided. Usage:\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
 
 	psock, err := net.Listen("tcp", listenStr)
 	log.Printf("Listening to %s\n", listenStr)
