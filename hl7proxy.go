@@ -162,7 +162,9 @@ func MessageToAidboxSender(in <-chan string, out chan string, aidboxUrl string, 
 			log.Printf("Received non-200 response: %v\n%s\n", response, body)
 			continue
 		} else {
-			log.Printf("Sent to Aidbox: %s\n", response.Status)
+			duration := response.Header.Get("x-duration")
+
+			log.Printf("Sent to Aidbox: %s (%sms)\n", response.Status, duration)
 		}
 	}
 }
