@@ -66,8 +66,10 @@ To be written. Short answer: use [NSSM](http://nssm.cc/) to register
 
 ## Support
 
-Feel free to join "Aidbox Users" Telegram group to ask questions:
-https://t.me/aidbox
+Feel free to join ["Aidbox Users" Telegram group](https://t.me/aidbox)
+to ask any questions regarding `hl7proxy` or Aidbox. Also you can
+create an issue in this repo to report bug, misbehaviour or ask for a
+feature request.
 
 ## License
 
