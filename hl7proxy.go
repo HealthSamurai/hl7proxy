@@ -203,9 +203,9 @@ func main() {
 	var headers flagsStringsArray = make(flagsStringsArray, 0)
 	flag.Var(&headers, "header", "Additional HTTP headers in format 'Header: value'")
 
-	listenStr := fmt.Sprintf(":%d", *port)
-
 	flag.Parse()
+
+	listenStr := fmt.Sprintf(":%d", *port)
 
 	if *configId == "" {
 		fmt.Printf("No required -config flag is provided. Usage:\n")
