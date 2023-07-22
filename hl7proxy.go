@@ -271,7 +271,7 @@ func main() {
 	flag.StringVar(&opts.aidboxUrl, "url", "", "Aidbox URL to send messages to (i.e. 'https://foo.aidbox.app/') (required)")
 	flag.StringVar(&opts.configId, "config", "", "An ID of existing Hl7v2Config resource (required)")
 	flag.StringVar(&opts.host, "host", "", "host to listen")
-	flag.IntVar(&opts.maxmsgsize, "max-message-size", 64, "Max messege size in kB, default is 64kB")
+	flag.IntVar(&opts.maxmsgsize, "max-message-size", 64, "Max messege size in kB")
 
 	flag.Var(&opts.headers, "header", "Additional HTTP headers in format 'Header: value'")
 	
