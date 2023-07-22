@@ -113,6 +113,8 @@ func ConnectionHandler(conn net.Conn, opts options) {
 	defer conn.Close()
 	defer log.Printf("INFO: Client %s disconnected", conn.RemoteAddr())
 	var scanner = bufio.NewScanner(conn)
+	buf := make([]byte, opts.maxmsgsize * 1024 / 5)
+	scanner.Buffer(buf,opts.maxmsgsize * 1024)
 	scanner.Split(ScanHL7Msgs)
 
 	for scanner.Scan() {
@@ -257,6 +259,7 @@ type options struct {
 	aidboxUrl string;
 	configId string;
 	headers flagsStringsArray;
+	maxmsgsize int;
 }
 
 func main() {
@@ -268,6 +271,7 @@ func main() {
 	flag.StringVar(&opts.aidboxUrl, "url", "", "Aidbox URL to send messages to (i.e. 'https://foo.aidbox.app/') (required)")
 	flag.StringVar(&opts.configId, "config", "", "An ID of existing Hl7v2Config resource (required)")
 	flag.StringVar(&opts.host, "host", "", "host to listen")
+	flag.IntVar(&opts.maxmsgsize, "max-message-size", 64, "Max messege size in kB, default is 64kB")
 
 	flag.Var(&opts.headers, "header", "Additional HTTP headers in format 'Header: value'")
 	
