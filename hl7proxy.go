@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -151,7 +152,11 @@ func ConnectionHandler(conn net.Conn, opts options) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Printf("ERROR: Invalid data received: %s", err)
+		if errors.Is(err, bufio.ErrTooLong) {
+			log.Printf("ERROR: The size of the received message exceeds the maximum limit of %d kB. Please ensure the message size is within the permissible limit to avoid this error", opts.maxmsgsize * 1024)
+		} else {
+			log.Printf("ERROR: Invalid data received: %s", err)
+		}
 	}
 }
 
